@@ -54,7 +54,7 @@
                     <h3>Sign Up</h3>
                 </div>
                 <!-- Agrega el formulario aquí -->
-                <form action="" method="POST">
+                <form  method="POST">
                     {% csrf_token %}
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="floatingText" name="username" placeholder="jhondoe" required>
@@ -78,10 +78,20 @@
                     <p class="text-center mb-0">Already have an Account? <a href="{% url 'login_view'%}">Sign In</a></p>
                 </form>
                 <!-- Fin del formulario -->
+                {% if messages %}
+                <div id="error-message" class="alert alert-danger" 
+                role="alert" style="text-align: center;">
+                    {% for message in messages %}
+                    <div class="alert {{ message.tags }}" role="alert">
+                        <h6 class="alert-heading">{{ message }}</h6>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
-</div>
+</div>    
 <!-- Sign Up End -->
 
 
@@ -98,6 +108,7 @@
 
     <!-- Template Javascript -->
     <script src="{% static 'js/main.js'%}"></script>
+    <script src="{% static 'js/alerts/alert_signup.js'%}"></script>
 </body>
 
 </html>

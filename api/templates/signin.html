@@ -79,14 +79,14 @@
                             <p class="text-center mb-0">Don't have an Account? <a href="{% url 'register_view'%}">Sign Up</a></p>
                         </form>
                     </div>
-                    {% if messages %}
-                    {% for message in messages %}
-                    <div  id="error-message" class="alert alert-danger" 
-                    role="alert" style="text-align: center;">
-                        <h4 class="alert-heading">{{ message }}</h4>
-                    </div>
-                    {% endfor %}
-                    {% endif %}
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div  id="error-message" class="alert alert-danger" 
+                        role="alert" style="text-align: center;">
+                            <h4 class="alert-heading">{{ message }}</h4>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
                 </div>
             </div>
         </div>
