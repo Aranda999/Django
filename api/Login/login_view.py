@@ -27,7 +27,8 @@ def login_views(request):
 #Vista para registro
 def register_view(request):
     template_view = "signup.html"
-    
+    if request.user.is_authenticated:
+        return redirect('home') 
     if request.method == "POST":
         username = request.POST.get('username')
         email = request.POST.get('email')

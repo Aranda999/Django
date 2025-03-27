@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración de Imágenes</title>
+</head>
+<body>
+
+    <h1>Panel de Administración de Imágenes</h1>
+
+    <!-- Formulario para agregar una nueva imagen -->
+    <h2>Agregar Imagen</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Subir Imagen</button>
+    </form>
+
+    <!-- Listado de imágenes subidas -->
+    <h2>Imágenes Subidas</h2>
+    <div>
+        {% for imagen in imagenes %}
+            <div>
+                <h3>{{ imagen.titulo }}</h3>
+                <p>{{ imagen.descripcion }}</p>
+                <img src="{{ imagen.imagen.url }}" alt="{{ imagen.titulo }}" style="max-width: 300px;">
+            </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>

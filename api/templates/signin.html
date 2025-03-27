@@ -4,7 +4,6 @@
 
 <head>
     <meta charset="utf-8">
-    <title>DASHMIN - Bootstrap Admin Template</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -30,67 +29,86 @@
 
     <!-- Template Stylesheet -->
     <link href="{% static 'css/style.css'%}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
 </head>
 
 <body>
-    <div class="container-xxl position-relative bg-white d-flex p-0">
-        <!-- Spinner Start -->
-        <div id="spinner"
-            class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                <span class="sr-only">Loading...</span>
+    <!--Imagen del fondo principal-->
+    <img src="{% static 'img/FondoLogin.jpg' %}" style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; object-position: center; margin: 0; padding: 0; z-index: -1;">
+    <!-- Contenedor principal de login -->
+    <div class="LoginContainer">
+        <div class="Logos">
+            <img src="{% static 'img/IconCdmx.png' %}" alt="Logo 1" class="logo" style="height: 55px; width: 210px; position: relative; top: 10px; margin-left: 20px;">
+            <img src="{% static 'img/IconMetro.webp' %}" alt="Logo 2" class="logo" style="height: 60px; width: 120px; margin-left: 30px; position: relative; top: 10px;">
+            <p class="title">Bienvenido Login Access</p>
+            <i class="fa-solid fa-user" style="color: black; margin-left: 40px; position: relative; top: 40px; font-size: 30px;"></i>
+            <i class="fa-solid fa-lock" style="color: black; margin-left: -30px; position: relative; top: 115px; font-size: 30px;"></i>
+        </div
+        <form method="POST">
+            {% csrf_token %}
+            <div class="d-flex flex-column align-items-start" style="margin-left: 90px;">
+                <label for="floatingInput" style="color: black; font-size: 12px; font-weight: bold;">USERNAME</label>
+                <input type="text" class="form-control shadow-sm" id="floatingInput" name="username" placeholder="name@example.com" required style="width: 220px; height: 23px;">
             </div>
-        </div>
-        <!-- Spinner End -->
+            
+            <div class="d-flex flex-column align-items-start" style="margin-left: 90px;">
+                <label for="floatingPassword" style="color: black; font-size: 12px; font-weight: bold; position: relative; top: 35px;">PASSWORD</label>
+                <input type="password" class="form-control shadow-sm" id="floatingPassword" name="password" placeholder="Password" required style="width: 220px; height: 23px; position: relative; top: 35px;">
+            </div>
+            <button type="submit" class="btn btn-lg btn-primary shadow-sm" style="background-color: #ff6200; border-radius: 5px; width: 280px; height: 30px; position: relative; top: 80px; display: flex; justify-content: center; align-items: center; margin-left: 55px;">Sign In</button>
+            <p class="text-center mb-0"  style="position: relative; top: 100px;">Don't have an account? <a href="{% url 'register_view' %}" class="text-primary">Sign Up</a></p>
+        </form> 
+    </div>
 
 
-        <!-- Sign In Start -->
-        <div class="container-fluid">
-            <div class="row h-100 align-items-center justify-content-center" style="min-height: 100vh;">
-                <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4">
-                    <div class="bg-light rounded p-4 p-sm-5 my-4 mx-3">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <a href="index.html" class="">
-                                <h3 class="text-primary"><i class="fa fa-hashtag me-2"></i>DASHMIN</h3>
-                            </a>
-                            <h3>Sign In</h3>
-                        </div>
-                        <form method="POST">
-                            {% csrf_token %}
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" id="floatingInput" name='username'
-                                    placeholder="name@example.com" required>
-                                <label for="floatingInput">Email address</label>
-                            </div>
-                            <div class="form-floating mb-4">
-                                <input type="password" class="form-control" id="floatingPassword" name="password"
-                                    placeholder="Password" required>
-                                <label for="floatingPassword">Password</label>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-between mb-4">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                                    <label class="form-check-label" for="exampleCheck1">Check me out</label>
-                                </div>
-                                <a href="#">Forgot Password</a>
-                            </div>
-                            <button type="submit" class="btn btn-danger py-3 w-100 mb-4">Google Sign In</button>
-                            <button type="submit" class="btn btn-primary py-3 w-100 mb-2">Sign In</button>
-                            <p class="text-center mb-0">Don't have an Account? <a href="{% url 'register_view'%}">Sign Up</a></p>
-                        </form>
-                    </div>
-                        {% if messages %}
-                        {% for message in messages %}
-                        <div  id="error-message" class="alert alert-danger" 
-                        role="alert" style="text-align: center;">
-                            <h4 class="alert-heading">{{ message }}</h4>
-                        </div>
-                        {% endfor %}
-                        {% endif %}
-                </div>
-            </div>
+    <style>
+        .LoginContainer {
+            width: 400px; 
+            height: 500px;
+            margin: 40px auto;
+            margin-top: 110px;
+            background-color: rgb(255, 255, 255);
+            border: 1px solid #ddd; 
+            border-radius: 10px; 
+        }
+        .title{
+        text-align: center;
+        font-weight: bold;
+        margin-top: 45px;
+        font-family: 'Times New Roman', Times, serif;
+        color: black;
+        }
+
+         /* Media query para dispositivos móviles */
+        @media (max-width: 768px) {
+        .login-container {
+            width: 90%; /* Ancho del contenedor en dispositivos móviles */
+            margin: 20px auto; /* Margen superior e inferior en dispositivos móviles */
+        }
+        }
+        @media (max-width: 768px) {
+        .logo {
+        width: 30%; /* ajusta el ancho según sea necesario */
+        }
+        }
+    </style>
+
+
+
+
+
+        {% if messages %}
+        {% for message in messages %}
+        <div id="error-message" class="alert alert-danger" role="alert" style="text-align: center;">
+            <h4 class="alert-heading">{{ message }}</h4>
         </div>
-        <!-- Sign In End -->
+        {% endfor %}
+        {% endif %}
+    </div>
+    </div>
+    </div>
+    <!-- Sign In End -->
     </div>
 
     <!-- JavaScript Libraries -->

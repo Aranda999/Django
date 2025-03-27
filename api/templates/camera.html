@@ -1,0 +1,275 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <title>Perros y Gatos</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <style>
+      /* Estilos generales */
+      #resultado {
+        font-weight: bold;
+        font-size: 16px; /* Tamaño base */
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-right: 20px;
+        padding: 20px;
+        border: 2px solid #4CAF50;
+        border-radius: 10px;
+        background-color: #f0f0f0;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: auto;
+        max-width: 90%; /* Limitar al 90% del ancho de la pantalla */
+      }
+    
+      /* Medidas responsivas para pantallas más pequeñas */
+      @media (max-width: 600px) {
+        #resultado {
+          width: 90%;
+          font-size: 14px; /* Disminuir el tamaño de fuente en pantallas pequeñas */
+          padding: 15px;
+        }
+      }
+    
+      @media (max-width: 400px) {
+        #resultado {
+          width: 95%;
+          font-size: 12px; /* Aún más pequeño en pantallas más pequeñas */
+          padding: 10px;
+        }
+      }
+    
+      /* Estilo para el video y canvas */
+      video, canvas {
+        width: 100%; /* Asegura que se adapten al ancho del contenedor */
+        height: auto; /* Mantener la proporción del video/canvas */
+      }
+    
+      /* Asegura que el contenedor general se ajuste bien en pantallas pequeñas */
+      .container {
+        padding: 15px;
+        max-width: 100%;
+      }
+    
+      /* Contenedor de video */
+      .video-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+    
+    <body>
+      <main>
+        <div class="px-4 py-2 my-2 text-center border-bottom">
+          <img class="d-block mx-auto mb-2" src="LogotipoV2-Simple.png" alt="" width="80" height="80">
+          <h1 class="display-5 fw-bold"></h1>
+        </div>
+      
+        <div class="b-example-divider"></div>
+      
+        <div class="container mt-5">
+          <div class="row justify-content-center">
+            <div class="col-12 col-md-6 col-lg-4 text-center">
+              <!-- Contenedor para el video -->
+              <div class="video-container">
+                <video id="video" playsinline autoplay></video>
+                <canvas id="canvas" width="400" height="400" style="max-width: 100%;"></canvas>
+                <div id="resultado"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="b-example-divider"></div>
+      
+        <div class="bg-green text-secondary mt-4 px-4 py-2 text-center" style="background-color: bisque;">
+          <div class="py-5" style="background-color: bisque;">
+            <h1 class="display-5 fw-bold text-white">PetSmart</h1>
+          </div>
+        </div>
+      
+        <div class="b-example-divider mb-0"></div>
+      </main>
+    
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    
+      <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+    
+      <script type="text/javascript">
+        var tamano = 400;
+        var video = document.getElementById("video");
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        var currentStream = null;
+        var modelo = null;
+    
+        // Cargar el modelo de TensorFlow
+        (async () => {
+          console.log("Cargando modelo...");
+          modelo = await tf.loadLayersModel("{% static '/models/model.json' %}");
+          console.log("Modelo cargado");
+        })();
+    
+        window.onload = function () {
+          mostrarCamara();
+        }
+    
+        // Mostrar la cámara
+        function mostrarCamara() {
+          var opciones = {
+            audio: false,
+            video: {
+              width: tamano, height: tamano
+            }
+          }
+    
+          if (navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia(opciones)
+              .then(function (stream) {
+                currentStream = stream;
+                video.srcObject = currentStream;
+                procesarCamara();
+                predecir();
+              })
+              .catch(function (err) {
+                alert("No se pudo utilizar la camara :(");
+                console.log(err);
+              })
+          } else {
+            alert("No existe la funcion getUserMedia");
+          }
+        }
+    
+        function procesarCamara() {
+          ctx.drawImage(video, 0, 0, tamano, tamano, 0, 0, tamano, tamano);
+          setTimeout(procesarCamara, 20);
+        }
+    
+        // Función de predicción
+        function predecir() {
+          if (modelo != null) {
+            resample_single(canvas, 100, 100, canvas);
+    
+            var imgData = ctx.getImageData(0, 0, 100, 100);
+            var arr = [];
+            var arr100 = [];
+    
+            for (var p = 0; p < imgData.data.length; p += 4) {
+              var rojo = imgData.data[p] / 255;
+              var verde = imgData.data[p + 1] / 255;
+              var azul = imgData.data[p + 2] / 255;
+              var gris = (rojo + verde + azul) / 3;
+              arr100.push([gris]);
+              if (arr100.length == 100) {
+                arr.push(arr100);
+                arr100 = [];
+              }
+            }
+    
+            arr = [arr];
+            var tensor = tf.tensor4d(arr);
+            var resultado = modelo.predict(tensor).dataSync();
+            var respuesta, cuidados;
+    
+            if (resultado <= 0.5) {
+              respuesta = "Gato";
+              cuidados = `
+                <ul>
+                  <li>Asegúrate de que tenga acceso a agua limpia y fresca en todo momento.</li>
+                  <li>Proporciona una dieta balanceada y adecuada a su edad y peso.</li>
+                  <li>Mantén su caja de arena limpia y en un lugar tranquilo.</li>
+                  <li>Haz visitas regulares al veterinario para chequeos de salud.</li>
+                  <li>Proporciónale espacio para jugar y explorar, así como zonas de descanso tranquilas.</li>
+                </ul>`;
+            } else {
+              respuesta = "Perro";
+              cuidados = `
+                <ul>
+                  <li>Proporciona una alimentación adecuada a su tamaño y edad.</li>
+                  <li>Haz ejercicio regular para mantenerlo en forma y saludable.</li>
+                  <li>Haz chequeos periódicos con el veterinario para prevenir enfermedades.</li>
+                  <li>Asegúrate de que tenga un lugar cómodo y seguro para dormir.</li>
+                  <li>Bríndale atención y cariño para mantener su bienestar emocional.</li>
+                </ul>`;
+            }
+    
+            document.getElementById("resultado").innerHTML = `<h2>${respuesta}</h2><strong>Cuidados importantes:</strong>${cuidados}`;
+            setTimeout(predecir, 150);
+          }
+        }
+    
+        function resample_single(canvas, width, height, resize_canvas) {
+          // Código para cambiar el tamaño de la imagen
+          var width_source = canvas.width;
+          var height_source = canvas.height;
+          var ratio_w = width_source / width;
+          var ratio_h = height_source / height;
+    
+          var ctx = canvas.getContext("2d");
+          var ctx2 = resize_canvas.getContext("2d");
+          var img = ctx.getImageData(0, 0, width_source, height_source);
+          var img2 = ctx2.createImageData(width, height);
+          var data = img.data;
+          var data2 = img2.data;
+    
+          // Redimensionado usando el filtro Hermite (y manteniendo la calidad)
+          for (var j = 0; j < height; j++) {
+            for (var i = 0; i < width; i++) {
+              var x2 = (i + j * width) * 4;
+              var weight = 0;
+              var weights = 0;
+              var weights_alpha = 0;
+              var gx_r = 0;
+              var gx_g = 0;
+              var gx_b = 0;
+              var gx_a = 0;
+              var center_y = (j + 0.5) * ratio_h;
+              var center_x = (i + 0.5) * ratio_w;
+    
+              for (var ky = 0; ky < ratio_h; ky++) {
+                for (var kx = 0; kx < ratio_w; kx++) {
+                  var px = Math.floor(center_x - ratio_w * kx);
+                  var py = Math.floor(center_y - ratio_h * ky);
+    
+                  if (px < 0 || py < 0 || px >= width_source || py >= height_source) continue;
+                  var p = (py * width_source + px) * 4;
+    
+                  var w = Math.max(0, 1 - (kx * kx + ky * ky) / 2);
+                  weights += w;
+                  weights_alpha += w;
+                  gx_r += data[p] * w;
+                  gx_g += data[p + 1] * w;
+                  gx_b += data[p + 2] * w;
+                  gx_a += data[p + 3] * w;
+                }
+              }
+    
+              data2[x2] = gx_r / weights;
+              data2[x2 + 1] = gx_g / weights;
+              data2[x2 + 2] = gx_b / weights;
+              data2[x2 + 3] = gx_a / weights_alpha;
+            }
+          }
+    
+          ctx2.putImageData(img2, 0, 0);
+        }
+      </script>
+    </body>    
+</html>
